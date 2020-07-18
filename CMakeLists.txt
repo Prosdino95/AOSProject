@@ -8,3 +8,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(BodyLoopExtractor)
 add_subdirectory(ModMCA)
+add_subdirectory(TAFFO)
