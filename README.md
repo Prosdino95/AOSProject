@@ -11,7 +11,7 @@ $ ./build.sh
 ## How to Test
 ```sh
 $ cd test
-$ ./test.sh
+$ ./test.sh test.c
 ```
 
 ## Body Loop Extractor
