@@ -1,0 +1,3 @@
+[submodule "TAFFO"]
+	path = TAFFO
+	url = https://github.com/HEAPLab/TAFFO
