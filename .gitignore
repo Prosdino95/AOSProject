@@ -33,4 +33,4 @@
 
 #Build directories
 /build/*
-/Dist/*
+/dist/*
