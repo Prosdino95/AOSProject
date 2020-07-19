@@ -1,9 +1,8 @@
 AOSProject
 
 ## How to Build
-I need to improve the building system.
-This projects supports only LLVM 8, and it need to be a system LLVM version installed.
-Simply run 
+This projects supports only LLVM 8, and it need to be a system LLVM version.<br/>
+Run
 ```sh
 $ ./build.sh
 ```

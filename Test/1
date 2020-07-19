@@ -1,0 +1,55 @@
+./covariance.c:107:55: warning: 'annotate' attribute ignored when parsing type [-Wignored-attributes]
+  POLYBENCH_2D_ARRAY_DECL(data,DATA_TYPE __attribute((annotate("scalar(range(-2097152, 2097151) final)"))),N,M,n,m);
+                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./polybench.h:136:104: note: expanded from macro 'POLYBENCH_2D_ARRAY_DECL'
+  var = POLYBENCH_ALLOC_2D_ARRAY(POLYBENCH_C99_SELECT(dim1, ddim1), POLYBENCH_C99_SELECT(dim2, ddim2), type);
+                                                                                                       ^~~~
+./polybench.h:121:170: note: expanded from macro 'POLYBENCH_ALLOC_2D_ARRAY'
+  (type(*)[n1 + POLYBENCH_PADDING_FACTOR][n2 + POLYBENCH_PADDING_FACTOR])polybench_alloc_data ((n1 + POLYBENCH_PADDING_FACTOR) * (n2 + POLYBENCH_PADDING_FACTOR), sizeof(type))
+                                                                                                                                                                         ^~~~
+./covariance.c:107:55: warning: 'annotate' attribute ignored when parsing type [-Wignored-attributes]
+  POLYBENCH_2D_ARRAY_DECL(data,DATA_TYPE __attribute((annotate("scalar(range(-2097152, 2097151) final)"))),N,M,n,m);
+                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./polybench.h:136:104: note: expanded from macro 'POLYBENCH_2D_ARRAY_DECL'
+  var = POLYBENCH_ALLOC_2D_ARRAY(POLYBENCH_C99_SELECT(dim1, ddim1), POLYBENCH_C99_SELECT(dim2, ddim2), type);
+                                                                                                       ^~~~
+./polybench.h:121:4: note: expanded from macro 'POLYBENCH_ALLOC_2D_ARRAY'
+  (type(*)[n1 + POLYBENCH_PADDING_FACTOR][n2 + POLYBENCH_PADDING_FACTOR])polybench_alloc_data ((n1 + POLYBENCH_PADDING_FACTOR) * (n2 + POLYBENCH_PADDING_FACTOR), sizeof(type))
+   ^~~~
+./covariance.c:108:54: warning: 'annotate' attribute ignored when parsing type [-Wignored-attributes]
+  POLYBENCH_2D_ARRAY_DECL(cov,DATA_TYPE __attribute((annotate("scalar(range(-2097152, 2097151) final)"))),M,M,m,m);
+                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./polybench.h:136:104: note: expanded from macro 'POLYBENCH_2D_ARRAY_DECL'
+  var = POLYBENCH_ALLOC_2D_ARRAY(POLYBENCH_C99_SELECT(dim1, ddim1), POLYBENCH_C99_SELECT(dim2, ddim2), type);
+                                                                                                       ^~~~
+./polybench.h:121:170: note: expanded from macro 'POLYBENCH_ALLOC_2D_ARRAY'
+  (type(*)[n1 + POLYBENCH_PADDING_FACTOR][n2 + POLYBENCH_PADDING_FACTOR])polybench_alloc_data ((n1 + POLYBENCH_PADDING_FACTOR) * (n2 + POLYBENCH_PADDING_FACTOR), sizeof(type))
+                                                                                                                                                                         ^~~~
+./covariance.c:108:54: warning: 'annotate' attribute ignored when parsing type [-Wignored-attributes]
+  POLYBENCH_2D_ARRAY_DECL(cov,DATA_TYPE __attribute((annotate("scalar(range(-2097152, 2097151) final)"))),M,M,m,m);
+                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./polybench.h:136:104: note: expanded from macro 'POLYBENCH_2D_ARRAY_DECL'
+  var = POLYBENCH_ALLOC_2D_ARRAY(POLYBENCH_C99_SELECT(dim1, ddim1), POLYBENCH_C99_SELECT(dim2, ddim2), type);
+                                                                                                       ^~~~
+./polybench.h:121:4: note: expanded from macro 'POLYBENCH_ALLOC_2D_ARRAY'
+  (type(*)[n1 + POLYBENCH_PADDING_FACTOR][n2 + POLYBENCH_PADDING_FACTOR])polybench_alloc_data ((n1 + POLYBENCH_PADDING_FACTOR) * (n2 + POLYBENCH_PADDING_FACTOR), sizeof(type))
+   ^~~~
+./covariance.c:109:55: warning: 'annotate' attribute ignored when parsing type [-Wignored-attributes]
+  POLYBENCH_1D_ARRAY_DECL(mean,DATA_TYPE __attribute((annotate("scalar()"))),M,m);
+                                                      ^~~~~~~~~~~~~~~~~~~~
+./polybench.h:133:69: note: expanded from macro 'POLYBENCH_1D_ARRAY_DECL'
+  var = POLYBENCH_ALLOC_1D_ARRAY(POLYBENCH_C99_SELECT(dim1, ddim1), type);
+                                                                    ^~~~
+./polybench.h:119:103: note: expanded from macro 'POLYBENCH_ALLOC_1D_ARRAY'
+  (type(*)[n1 + POLYBENCH_PADDING_FACTOR])polybench_alloc_data (n1 + POLYBENCH_PADDING_FACTOR, sizeof(type))
+                                                                                                      ^~~~
+./covariance.c:109:55: warning: 'annotate' attribute ignored when parsing type [-Wignored-attributes]
+  POLYBENCH_1D_ARRAY_DECL(mean,DATA_TYPE __attribute((annotate("scalar()"))),M,m);
+                                                      ^~~~~~~~~~~~~~~~~~~~
+./polybench.h:133:69: note: expanded from macro 'POLYBENCH_1D_ARRAY_DECL'
+  var = POLYBENCH_ALLOC_1D_ARRAY(POLYBENCH_C99_SELECT(dim1, ddim1), type);
+                                                                    ^~~~
+./polybench.h:119:4: note: expanded from macro 'POLYBENCH_ALLOC_1D_ARRAY'
+  (type(*)[n1 + POLYBENCH_PADDING_FACTOR])polybench_alloc_data (n1 + POLYBENCH_PADDING_FACTOR, sizeof(type))
+   ^~~~
+6 warnings generated.
