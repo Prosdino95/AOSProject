@@ -7,8 +7,8 @@
  *
  * Web address: http://polybench.sourceforge.net
  */
-#ifndef _COVARIANCE_H
-# define _COVARIANCE_H
+#ifndef _GRAMSCHMIDT_H
+# define _GRAMSCHMIDT_H
 
 /* Default to LARGE_DATASET. */
 # if !defined(MINI_DATASET) && !defined(SMALL_DATASET) && !defined(MEDIUM_DATASET) && !defined(LARGE_DATASET) && !defined(EXTRALARGE_DATASET)
@@ -18,28 +18,28 @@
 # if !defined(M) && !defined(N)
 /* Define sample dataset sizes. */
 #  ifdef MINI_DATASET
-#   define M 28
-#   define N 32
+#   define M 20
+#   define N 30
 #  endif
 
 #  ifdef SMALL_DATASET
-#   define M 80
-#   define N 100
+#   define M 60
+#   define N 80
 #  endif
 
 #  ifdef MEDIUM_DATASET
-#   define M 240
-#   define N 260
+#   define M 200
+#   define N 240
 #  endif
 
 #  ifdef LARGE_DATASET
-#   define M 1200
-#   define N 1400
+#   define M 1000
+#   define N 1200
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#   define M 2600
-#   define N 3000
+#   define M 2000
+#   define N 2600
 #  endif
 
 
@@ -57,6 +57,17 @@
 #ifdef DATA_TYPE_IS_INT
 #  define DATA_TYPE int
 #  define DATA_PRINTF_MODIFIER "%d "
+#endif
+
+#if defined(CONF_BAD)
+#define ANN1(min, max) __attribute__((annotate("scalar(range(" #min "," #max "))")))
+#define ANN2(min, max) __attribute__((annotate("scalar(range(-4194304,4194303))")))
+#elif defined(CONF_WORSE)
+#define ANN1(min, max)
+#define ANN2(min, max) __attribute__((annotate("scalar(range(" #min "," #max "))")))
+#else  // CONF_GOOD
+#define ANN1(min, max) __attribute__((annotate("scalar(range(" #min "," #max "))")))
+#define ANN2(min, max) __attribute__((annotate("scalar(range(" #min "," #max "))")))
 #endif
 
 #ifdef DATA_TYPE_IS_FLOAT
@@ -77,4 +88,4 @@
 #  define POW_FUN(x,y) pow(x,y)
 # endif
 
-#endif /* !_COVARIANCE_H */
+#endif /* !_GRAMSCHMIDT_H */
