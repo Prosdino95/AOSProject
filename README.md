@@ -9,9 +9,10 @@ $ ./build.sh
 
 ## How to Test
 ```sh
-$ cd test
-$ ./test.sh test2.c
+$ cd test/polybench-c-4.2.1-beta-novra
+$ ./run.sh
 ```
+Check the result in results/result.txt
 
 ## Body Loop Extractor
 A llvm pass that searchs loops in code and extract them in in new function and replase the loop in the original function with a call.<br/>
