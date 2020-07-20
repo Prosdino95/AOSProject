@@ -257,11 +257,6 @@ int main(int argc, char **argv) {
   InitializeAllTargetMCs();
   InitializeAllAsmParsers();
 
-  // Enable printing of available targets when flag --version is specified.
-  cl::AddExtraVersionPrinter(TargetRegistry::printRegisteredTargetsForVersion);
-
-  cl::HideUnrelatedOptions({&ToolOptions, &ViewOptions});
-
   // Parse flags and initialize target options.
   cl::ParseCommandLineOptions(argc, argv,
                               "llvm machine code performance analyzer.\n");
@@ -285,9 +280,6 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  // Apply overrides to llvm-mca specific options.
-  processViewOptions();
-
   SourceMgr SrcMgr;
 
   // Tell SrcMgr about this buffer, which is what the parser will pick up.
@@ -302,8 +294,6 @@ int main(int argc, char **argv) {
   MCObjectFileInfo MOFI;
   MCContext Ctx(MAI.get(), MRI.get(), &MOFI, &SrcMgr);
   MOFI.InitMCObjectFileInfo(TheTriple, /* PIC= */ false, Ctx);
-
-  std::unique_ptr<buffer_ostream> BOS;
 
   std::unique_ptr<MCInstrInfo> MCII(TheTarget->createMCInstrInfo());
 
@@ -432,7 +422,7 @@ int main(int argc, char **argv) {
 
     // Create a basic pipeline simulating an out-of-order backend.
     auto P = MCA.createDefaultPipeline(PO, IB, S);
-    mca::PipelinePrinter Printer(*P);
+   // mca::PipelinePrinter Printer(*P);
 
     Expected<unsigned> Cycles = P->run();
     if (!Cycles) {    
@@ -450,7 +440,7 @@ int main(int argc, char **argv) {
 
   std::cout<< "Num of Loops: "<<numOfLoops <<"\n";
   std::cout<< "TOT Cycles:  "<<TotLoopCycle<<"\n";
-  std::cout<< "AVG of Cycles: "<<(float)TotLoopCycle/numOfLoops<<"\n";
+  //std::cout<< "AVG of Cycles: "<<(float)TotLoopCycle/numOfLoops<<"\n";
 
   TOF->keep();
   return 0;

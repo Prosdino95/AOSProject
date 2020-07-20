@@ -163,18 +163,11 @@ bool BodyLoopExtractor::runOnLoop(Loop *L, LPPassManager &LPM) {
         ShouldExtractLoop = false;
         break;
       }
-  }
-
-  //if(std::find(v.begin(), v.end(), L->getHeader()->getParent())!= v.end()){
-  //  ShouldExtractLoop= false;
-  //  Changed=true;
-  //}
-
-  
+  } 
 
   if (ShouldExtractLoop) {
       handleSubLoop(L);
-      LPM.markLoopAsDeleted(*L);
+      //LPM.markLoopAsDeleted(*L);
   }
  return Changed;
 }

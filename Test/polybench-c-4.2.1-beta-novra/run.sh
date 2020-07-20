@@ -1,30 +1,15 @@
 #!/bin/bash
 
-if ! command -v opt-8 > /dev/null
-then
-    if ! command -v opt > /dev/null
-    then	
-      echo no llvm found		
-      exit
-    else
-      OPT=opt
-      LLC=llc
-      CLANG=clang
-    fi  
+if [[ -z $LLVM_DIR ]]; then
+  echo -e '\033[33m'"Warning"'\033[39m'" using default llvm/clang";
 else
-    OPT=opt-8
-    LLC=llc-8
-    CLANG=clang-8     	
-fi
-
-LLVMVERSION="$($OPT --version | grep version)" 
-VESRION="  LLVM version 8.0.1"
-
-if [[ $LLVMVERSION != "$VESRION" ]]
-	then
-		echo wrong llvm version
-		exit
-fi		
+  llvmbin="$LLVM_DIR/bin/";
+fi  
+if [[ -z "$CLANG" ]]; then CLANG=${llvmbin}clang; fi
+if [[ -z "$CLANGXX" ]]; then CLANGXX=${CLANG}++; fi
+if [[ -z "$OPT" ]]; then OPT=${llvmbin}opt; fi
+if [[ -z "$LLC" ]]; then LLC=${llvmbin}llc; fi
+if [[ -z "$LLVM_LINK" ]]; then LLVM_LINK=${llvmbin}llvm-link; fi
 
 mkdir -p results
 rm results/result.txt
@@ -38,7 +23,7 @@ run_test(){
 	$LLC -O0 ./outNormal.ll 
 	echo normal compiling 
 	echo
-	#../../dist/usr/local/bin/MOD-Llvm-mca outNormal.s # 2> /dev/null
+	../../dist/usr/local/bin/MOD-Llvm-mca outNormal.s # 2> /dev/null
 
 	#TAFFO Program
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoInitializer.so -taffoinit -S -o program-taffo.2.magiclangtmp.ll ./out.ll
@@ -50,7 +35,7 @@ run_test(){
 	echo
 	echo TAFFO compiling 
 	echo
-	#../../dist/usr/local/bin/MOD-Llvm-mca outTAFFO.s #2> /dev/null
+	../../dist/usr/local/bin/MOD-Llvm-mca outTAFFO.s #2> /dev/null
 	rm *.ll #*.s
 	echo
 }
@@ -61,13 +46,11 @@ run_one()
   file_name="${benchpath##*/}"
   echo  $file_name >> ./results/result.txt
 
-  run_test $1 >> ./results/result.txt
+  run_test $1 #>> ./results/result.txt
   
 }
 
-#all_benchs=$(cat ./utilities/benchmark_list)
-#for bench in $all_benchs; do
-	run_one "./linear-algebra/kernels/2mm/2mm.c"
-#done	
-
-	
+all_benchs=$(cat ./utilities/benchmark_list)
+for bench in $all_benchs; do
+	run_one "$bench"
+done	

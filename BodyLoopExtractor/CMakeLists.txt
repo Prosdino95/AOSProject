@@ -1,5 +1,3 @@
-
-
 find_package(LLVM REQUIRED CONFIG)
 
 add_definitions(${LLVM_DEFINITIONS})
@@ -14,4 +12,3 @@ add_llvm_library(BodyLoopExtractor MODULE
   opt
 )
 
-#install(TARGETS BodyLoopExtractor DESTINATION bin)

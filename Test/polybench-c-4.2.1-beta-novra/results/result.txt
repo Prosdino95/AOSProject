@@ -1,7 +1,330 @@
-2mm.c
+correlation.c
 normal compiling
 
+Num of Loops: 6
+TOT Cycles:  10035
 
 TAFFO compiling
 
+Num of Loops: 6
+TOT Cycles:  9498
+
+covariance.c
+normal compiling
+
+Num of Loops: 5
+TOT Cycles:  7586
+
+TAFFO compiling
+
+Num of Loops: 5
+TOT Cycles:  7189
+
+2mm.c
+normal compiling
+
+Num of Loops: 7
+TOT Cycles:  23495
+
+TAFFO compiling
+
+Num of Loops: 7
+TOT Cycles:  28018
+
+3mm.c
+normal compiling
+
+Num of Loops: 8
+TOT Cycles:  24513
+
+TAFFO compiling
+
+Num of Loops: 8
+TOT Cycles:  28544
+
+atax.c
+normal compiling
+
+Num of Loops: 5
+TOT Cycles:  10931
+
+TAFFO compiling
+
+Num of Loops: 5
+TOT Cycles:  11862
+
+bicg.c
+normal compiling
+
+Num of Loops: 6
+TOT Cycles:  20763
+
+TAFFO compiling
+
+Num of Loops: 6
+TOT Cycles:  22452
+
+doitgen.c
+normal compiling
+
+Num of Loops: 4
+TOT Cycles:  14970
+
+TAFFO compiling
+
+Num of Loops: 5
+TOT Cycles:  19545
+
+mvt.c
+normal compiling
+
+Num of Loops: 5
+TOT Cycles:  16847
+
+TAFFO compiling
+
+Num of Loops: 5
+TOT Cycles:  16993
+
+gemm.c
+normal compiling
+
+Num of Loops: 5
+TOT Cycles:  18094
+
+TAFFO compiling
+
+Num of Loops: 5
+TOT Cycles:  21806
+
+gemver.c
+normal compiling
+
+Num of Loops: 6
+TOT Cycles:  13002
+
+TAFFO compiling
+
+Num of Loops: 6
+TOT Cycles:  12956
+
+gesummv.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  15134
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  16540
+
+symm.c
+normal compiling
+
+Num of Loops: 4
+TOT Cycles:  22328
+
+TAFFO compiling
+
+Num of Loops: 4
+TOT Cycles:  22176
+
+syr2k.c
+normal compiling
+
+Num of Loops: 4
+TOT Cycles:  17966
+
+TAFFO compiling
+
+Num of Loops: 4
+TOT Cycles:  21530
+
+syrk.c
+normal compiling
+
+Num of Loops: 4
+TOT Cycles:  13967
+
+TAFFO compiling
+
+Num of Loops: 4
+TOT Cycles:  16426
+
+trmm.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  9990
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  11246
+
+cholesky.c
+normal compiling
+
+Num of Loops: 6
+TOT Cycles:  11842
+
+TAFFO compiling
+
+Num of Loops: 6
+TOT Cycles:  12626
+
+durbin.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  6744
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  6289
+
+gramschmidt.c
+normal compiling
+
+Num of Loops: 5
+TOT Cycles:  15954
+
+TAFFO compiling
+
+Num of Loops: 5
+TOT Cycles:  17365
+
+lu.c
+normal compiling
+
+Num of Loops: 6
+TOT Cycles:  11842
+
+TAFFO compiling
+
+Num of Loops: 6
+TOT Cycles:  12625
+
+ludcmp.c
+normal compiling
+
+Num of Loops: 9
+TOT Cycles:  13907
+
+TAFFO compiling
+
+Num of Loops: 9
+TOT Cycles:  14383
+
+trisolv.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  6535
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  6680
+
+deriche.c
+normal compiling
+
+Num of Loops: 8
+TOT Cycles:  17108
+
+TAFFO compiling
+
+Num of Loops: 8
+TOT Cycles:  16802
+
+floyd-warshall.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  25855
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  24361
+
+nussinov.c
+normal compiling
+
+Num of Loops: 4
+TOT Cycles:  11965
+
+TAFFO compiling
+
+Num of Loops: 4
+TOT Cycles:  11868
+
+adi.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  8105
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  7667
+
+fdtd-2d.c
+normal compiling
+
+Num of Loops: 6
+TOT Cycles:  17770
+
+TAFFO compiling
+
+Num of Loops: 6
+TOT Cycles:  17784
+
+heat-3d.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  9910
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  10416
+
+jacobi-1d.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  7093
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  6488
+
+jacobi-2d.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  7607
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  7261
+
+seidel-2d.c
+normal compiling
+
+Num of Loops: 3
+TOT Cycles:  8202
+
+TAFFO compiling
+
+Num of Loops: 3
+TOT Cycles:  7905
 
