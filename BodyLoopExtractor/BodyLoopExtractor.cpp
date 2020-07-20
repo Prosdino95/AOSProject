@@ -21,9 +21,15 @@
 #include "llvm/Transforms/Utils.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include "llvm/Transforms/Utils/CodeExtractor.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/InlineAsm.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/IRBuilder.h"
 #include <fstream>
 #include <vector>
 #include <set>
+#include <iostream>
+#include <algorithm>
 using namespace llvm;
 
 #define DEBUG_TYPE "body-loop-extractor"
@@ -34,6 +40,7 @@ namespace {
   struct BodyLoopExtractor : public LoopPass {
     static char ID; // Pass identification.
     std::vector<Function *> v;
+    unsigned int loopNumber = 1;
 
     explicit BodyLoopExtractor()
       : LoopPass(ID){
@@ -46,6 +53,8 @@ namespace {
 
     void handleSubLoop(Loop *L);
 
+    void addAnnotation(Loop *L);
+
     void getAnalysisUsage(AnalysisUsage &AU) const override {
       AU.addRequiredID(BreakCriticalEdgesID);
       AU.addRequiredID(LoopSimplifyID);
@@ -57,17 +66,6 @@ namespace {
 }
 
 char BodyLoopExtractor::ID = 0;
-/*
-INITIALIZE_PASS_BEGIN(BodyLoopExtractor, "body-loop-extractor",
-                      "Extract body loops into new functions", false, false)
-INITIALIZE_PASS_DEPENDENCY(BreakCriticalEdges)
-INITIALIZE_PASS_DEPENDENCY(LoopSimplify)
-INITIALIZE_PASS_DEPENDENCY(DominatorTreeWrapperPass)
-INITIALIZE_PASS_END(BodyLoopExtractor, "body-loop-extractor",
-                    "Extract body loops into new functions", false, false)
-                    */
-
-//Pass *llvm::createBodyLoopExtractorPass() { return new BodyLoopExtractor(); }
 
  void BodyLoopExtractor::extractCode(Loop *L){
 
@@ -87,10 +85,47 @@ INITIALIZE_PASS_END(BodyLoopExtractor, "body-loop-extractor",
   }
 }
 
+void BodyLoopExtractor::addAnnotation(Loop *L){
+  Type *ResultType;
+  std::vector<llvm::Value*> Args;
+  BasicBlock *B = L->getHeader();
+
+  ResultType = Type::getVoidTy(B->getContext());
+  FunctionType *fTy = FunctionType::get(ResultType,false);
+  IRBuilder< ConstantFolder,IRBuilderDefaultInserter > Builder(B->getContext());
+  StringRef asmString = "# LLVM-MCA-BEGIN " ;//+ std::__cxx11::to_string(loopNumber); 
+  InlineAsm *iaExpr = InlineAsm::get(fTy, asmString, "~{dirflag},~{fpsr},~{flags}",
+                                         false ,false, InlineAsm::AD_ATT); 
+  Instruction *Result = Builder.CreateCall(iaExpr, Args);
+  
+  auto i = B->begin();
+  while(i->getOpcode()==Instruction::PHI){
+    i++;
+  }
+  
+  B->getInstList().insert(i,Result);
+  
+  B=L->getUniqueExitBlock();
+  if(B == nullptr){ 
+    //TODO Che michia faccio se ho piú di un exit block?
+    std::cout<<"NULLO"<<std::endl;
+    return;
+  }
+
+   BasicBlock::iterator it = B->end();
+  asmString = "# LLVM-MCA-END";
+  iaExpr = InlineAsm::get(fTy, asmString, "~{dirflag},~{fpsr},~{flags}",
+                                         false ,false, InlineAsm::AD_ATT);
+  Result = Builder.CreateCall(iaExpr, Args);
+  //i->insertAfter(Result);
+  //std::cout<<B->getInstList() <<std::endl;
+  B->getInstList().insertAfter(it, Result);  
+}
+
 void BodyLoopExtractor::handleSubLoop(Loop *L) {
   std::vector<Loop *> sloops = L->getSubLoops();
   if(sloops.size() == 0 ){
-    extractCode(L);
+    addAnnotation(L);
   }
   else 
     for (Loop *SL : sloops)
@@ -98,6 +133,7 @@ void BodyLoopExtractor::handleSubLoop(Loop *L) {
 }
 
 bool BodyLoopExtractor::runOnLoop(Loop *L, LPPassManager &LPM) {
+
   if (skipLoop(L)){
     return false;
   }
@@ -109,7 +145,7 @@ bool BodyLoopExtractor::runOnLoop(Loop *L, LPPassManager &LPM) {
   // If LoopSimplify form is not available, stay out of trouble.
   if (!L->isLoopSimplifyForm()){
     return false;
-  }
+  } 
 
   bool Changed = false;
 
@@ -129,10 +165,10 @@ bool BodyLoopExtractor::runOnLoop(Loop *L, LPPassManager &LPM) {
       }
   }
 
-  if(std::find(v.begin(), v.end(), L->getHeader()->getParent())!= v.end()){
-    ShouldExtractLoop= false;
-    Changed=true;
-  }
+  //if(std::find(v.begin(), v.end(), L->getHeader()->getParent())!= v.end()){
+  //  ShouldExtractLoop= false;
+  //  Changed=true;
+  //}
 
   
 
