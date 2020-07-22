@@ -11,6 +11,6 @@ if (${LLVM_PACKAGE_VERSION} NOT EQUAL "8.0.1")
 	    exit()
 endif()
 
-add_subdirectory(BodyLoopExtractor)
+add_subdirectory(LoopFinder)
 add_subdirectory(ModMCA)
 add_subdirectory(TAFFO)

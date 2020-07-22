@@ -13,8 +13,10 @@ int sub(int a){
 	for (int i = 0; i < 90; ++i)
 	{
 		a = a+7;
-		if (a==5)
+		if (a==5){
 			a= a+3;
+			//return 2;
+		}
 	}
 
 	return 2;

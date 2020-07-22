@@ -19,24 +19,24 @@ run_test(){
 	$CLANG -O0 -Xclang -disable-O0-optnone -I. -I./utilities -S -emit-llvm $1 -o out.ll 2> /dev/null
 
 	#normal program
-	$OPT -load ~/AOSProject/dist/usr/local/lib/BodyLoopExtractor.so -BodyLoopExtractor ./out.ll -S -o ./outNormal.ll
+	$OPT -load ~/AOSProject/dist/usr/local/lib/LoopFinder.so -simplifyLoop -LoopFinder ./out.ll -S -o ./outNormal.ll
 	$LLC -O0 ./outNormal.ll 
 	echo normal compiling 
 	echo
-	../../dist/usr/local/bin/MOD-Llvm-mca outNormal.s # 2> /dev/null
+	../../dist/usr/local/bin/MOD-Llvm-mca outNormal.s  2> /dev/null
 
 	#TAFFO Program
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoInitializer.so -taffoinit -S -o program-taffo.2.magiclangtmp.ll ./out.ll
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoVRA.so -mem2reg -taffoVRA -S -o program-taffo.3.magiclangtmp.ll program-taffo.2.magiclangtmp.ll
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoDTA.so -taffodta -globaldce -S -o program-taffo.4.magiclangtmp.ll program-taffo.3.magiclangtmp.ll
 	$OPT -load ~/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so -flttofix -globaldce -dce -S -o out2.ll program-taffo.4.magiclangtmp.ll
-	$OPT -load ~/AOSProject/dist/usr/local/lib/BodyLoopExtractor.so -BodyLoopExtractor ./out2.ll -S -o ./outTAFFO.ll
+	$OPT -load ~/AOSProject/dist/usr/local/lib/LoopFinder.so -LoopFinder ./out2.ll -S -o ./outTAFFO.ll
 	$LLC -O0 ./outTAFFO.ll 
 	echo
 	echo TAFFO compiling 
 	echo
-	../../dist/usr/local/bin/MOD-Llvm-mca outTAFFO.s #2> /dev/null
-	rm *.ll #*.s
+	../../dist/usr/local/bin/MOD-Llvm-mca outTAFFO.s 2> /dev/null
+	rm *.ll *.s
 	echo
 }
 
@@ -46,11 +46,14 @@ run_one()
   file_name="${benchpath##*/}"
   echo  $file_name >> ./results/result.txt
 
-  run_test $1 #>> ./results/result.txt
+  run_test $1 >> ./results/result.txt
   
 }
 
 all_benchs=$(cat ./utilities/benchmark_list)
+echo run test
 for bench in $all_benchs; do
 	run_one "$bench"
+	#run_one "../test.c"
 done	
+echo done check results/result.txt
