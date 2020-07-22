@@ -1,30 +1,44 @@
-AOSProject
+# AOSProject
+
+This project uses LLVM-MCA to compare the fixed-point code produced by TAFFO with the original floating-point code for all loops.</br> 
+LLVM-MCA is a tool that simulates the inner behavior of the CPU to estimate the performance of a machine code snippet.</br> 
+TAFFO is an auto-tuning framework, based on LLVM 8, which tries to replace floating-point operations with fixed-point operations as much as possible.
+
 
 ## How to Build
-This projects supports only LLVM 8. <br/>
+This project supports only LLVM 8.</br> 
+Create a build directory. </br> 
+If you have a single system LLVM version installed, you may omit to set the LLVM_DIR variable to the LLVM distribution path you want to use.
 Run
 ```sh
-$ ./build.sh
+export LLVM_DIR=/usr/local/llvm-8
+mkdir build dist
+cd build
+cmake ..
+make install DESTDIR=../dist
 ```
+## How to use
+To execute all LLVM passes need to compile the code and run the LLVM-mca you can use the tool.sh script as follows.</br> 
+
+Modify the application to insert annotations on the appropriate variable declarations, see TAFFO documentation for more details.</br> 
+You can set the CPU variable by use `export CPU=x86` to indicate witch architecture mca have to use.</br> 
+If no CPU variable was set, mca uses the default one.</br> 
+Check LLVM-MCA documentation for more details about the architecture supported. </br> 
+
+```sh
+.\tool.sh program.c
+
+```
+Check file result.txt for the output of the analysis.</br> 
 
 ## How to Test
+
 ```sh
 $ cd test/polybench-c-4.2.1-beta-novra
 $ ./run.sh
+
 ```
 Check the result in results/result.txt
-
-## Body Loop Extractor
-A LLVM pass that search loops in code extract them in new function and replace the loop in the original function with a call.<br/>
-I case of a nested loops it extracts only the most inner loops.<br/>
-
-
-## ModMca
-A modified version of llmv-mca, most the files are the original ones, i made a few change in this two file.<br/>
-**CodeRegionGenerator:** In normal condition MCA look for two comments in the assembly code 
-(LLVM-MCA-BEGIN and LLVM-MCA-END) to identify the code region to analyze.
-I modified the code inside CodeRegionGenerator.cpp so instead of looking for "LLVM-MCA-BEGIN" looks for all comments that match the string "* .extracted *"and instead of LLVM-MCA-END the comment "-- END FUNCTION ".<br/>
-**llvm-mca2:** A modified version of the main of LLVM-MCA that compute the total number of machine cycle (Need an heuristic to give a different weight to the loops)<br/>
 
 ## TAFFO
 https://github.com/HEAPLab/TAFFO
