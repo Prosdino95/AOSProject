@@ -57,6 +57,9 @@
 
 using namespace llvm;
 
+
+/******  From this point on, the code is the original code of LLVM-MCA ****************/
+
 static cl::OptionCategory ToolOptions("Tool Options");
 static cl::OptionCategory ViewOptions("View Options");
 
@@ -346,13 +349,6 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  // Now initialize the output file.
-  auto OF = getOutputStream();
-  if (std::error_code EC = OF.getError()) {
-    WithColor::error() << EC.message() << '\n';
-    return 1;
-  }
-
   unsigned AssemblerDialect = CRG.getAssemblerDialect();
   if (OutputAsmVariant >= 0)
     AssemblerDialect = static_cast<unsigned>(OutputAsmVariant);
@@ -365,9 +361,7 @@ int main(int argc, char **argv) {
         << AssemblerDialect << ".\n";
     return 1;
   }
-
-  std::unique_ptr<ToolOutputFile> TOF = std::move(*OF);
-
+  
   const MCSchedModel &SM = STI->getSchedModel();
 
   unsigned Width = SM.IssueWidth;
@@ -422,7 +416,10 @@ int main(int argc, char **argv) {
 
     // Create a basic pipeline simulating an out-of-order backend.
     auto P = MCA.createDefaultPipeline(PO, IB, S);
-   // mca::PipelinePrinter Printer(*P);
+
+
+/******  End of LLVM-MCA original code supplied code ****************/
+
 
     Expected<unsigned> Cycles = P->run();
     if (!Cycles) {    
@@ -442,6 +439,5 @@ int main(int argc, char **argv) {
   std::cout<< "TOT Cycles:  "<<TotLoopCycle<<"\n";
   //std::cout<< "AVG of Cycles: "<<(float)TotLoopCycle/numOfLoops<<"\n";
 
-  TOF->keep();
   return 0;
 }

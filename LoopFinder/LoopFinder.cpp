@@ -75,7 +75,7 @@ void LoopFinder::addAnnotation(Loop *L){
   asmInst = Builder.CreateCall(iaExpr, Args);
   
   //get the header
-  B=L->getLoopPreheader();
+  B=L->getHeader();
   //get the iterator at first non PHI instruction
   auto i = B->begin();
   while(i->getOpcode()==Instruction::PHI){

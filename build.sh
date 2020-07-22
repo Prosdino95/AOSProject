@@ -1,6 +1,5 @@
 #!/bin/sh
 
-rm -r build dist
 mkdir build dist
 cd build
 cmake ..
