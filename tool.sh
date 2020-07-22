@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ -z $LLVM_DIR ]]; then
-  echo -e '\033[33m'"Warning"'\033[39m'" using default llvm/clang";
+	echo -e '\033[33m'"Warning"'\033[39m'" using default llvm/clang";
 else
   llvmbin="$LLVM_DIR/bin/";
 fi  
@@ -14,13 +14,21 @@ if [[ -z "$LLVM_LINK" ]]; then LLVM_LINK=${llvmbin}llvm-link; fi
 if [[ "$CPU" ]]; then CPU=-march=${CPU}; fi
 if [[ "$ITER" ]]; then ITER=-iterations=${ITER}; fi	
 
-echo $CPU
+if [[ -z "$1" ]]; then 	
+	echo no input file 
+	exit; 
+fi
 
-mkdir -p results
-rm results/result.txt
-touch results/result.txt
+#if [[ -z "$2" ]]; 
+#	then
+#		touch result.txt;
+#		OUT=./result.txt;
+#	else
+#		touch $2 ;
+#		OUT=$2;		
+#fi
 
-run_test(){
+run(){
 	$CLANG -O0 -Xclang -disable-O0-optnone -I. -I./utilities -S -emit-llvm $1 -o out.ll 2> /dev/null
 
 	#normal program
@@ -28,7 +36,7 @@ run_test(){
 	$LLC -O0 ./outNormal.ll 
 	echo normal compiling 
 	echo
-	../../dist/usr/local/bin/MOD-Llvm-mca ${CPU} ${ITER} outNormal.s  2> /dev/null
+	./dist/usr/local/bin/MOD-Llvm-mca ${CPU} ${ITER} outNormal.s  2> /dev/null
 
 	#TAFFO Program
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoInitializer.so -taffoinit -S -o program-taffo.2.magiclangtmp.ll ./out.ll
@@ -40,24 +48,13 @@ run_test(){
 	echo
 	echo TAFFO compiling 
 	echo
-	../../dist/usr/local/bin/MOD-Llvm-mca ${CPU} ${ITER} outTAFFO.s 2> /dev/null
+	./dist/usr/local/bin/MOD-Llvm-mca ${CPU} ${ITER} outTAFFO.s 2> /dev/null
 	rm *.ll *.s
 	echo
 }
 
-run_one()
-{
-  benchpath=$1
-  file_name="${benchpath##*/}"
-  echo  $file_name >> ./results/result.txt
+run $1 >> $OUT
+echo done check $OUT
 
-  run_test $1  >> ./results/result.txt
-  
-}
 
-all_benchs=$(cat ./utilities/benchmark_list)
-echo run test
-for bench in $all_benchs; do
-	run_one "$bench"
-done	
-echo done check results/result.txt
+

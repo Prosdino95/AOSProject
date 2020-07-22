@@ -79,14 +79,8 @@ public:
 };
 
 void MCACommentConsumer::HandleComment(SMLoc Loc, StringRef CommentText) {
-  //std::cout << CommentText.str() << "\n";
-  std::string Commentstr,region_name;
-
-  region_name = "REG"+ std::to_string(numOfReg);
-
-  StringRef Comment(CommentText);
-  
   // Skip empty comments.
+  StringRef Comment(CommentText);
   if (Comment.empty())
     return;
 
@@ -96,30 +90,24 @@ void MCACommentConsumer::HandleComment(SMLoc Loc, StringRef CommentText) {
     // We reached the end of the comment. Bail out.
     return;
 
-  //get comment witout first space
   Comment = Comment.drop_front(Position);
-  Commentstr = Comment.str();
-
-  //if is a @ comment for a function and a .extracted for a function 
-  //extracted by Extract body loop.
-  if(Commentstr.at(0) == '@' && (Commentstr.find(".extracted") != std::string::npos)){
-    create_region=true;
+  if (Comment.consume_front("LLVM-MCA-END")) {
+    Regions.endRegion(Loc);
+    return;
   }
 
   // Try to parse the LLVM-MCA-BEGIN comment.
-  if (create_region){
-    Regions.beginRegion(region_name, Loc);
-    okReg = true;
-    create_region=false;
-  }
-  
-  if (okReg && (Commentstr.find("%.exitStub") != std::string::npos) ) {
-    Regions.endRegion(Loc);
-    numOfReg++;
-    okReg=false;
+  if (!Comment.consume_front("LLVM-MCA-BEGIN"))
     return;
-  }
+
+  // Skip spaces and tabs.
+  Position = Comment.find_first_not_of(" \t");
+  if (Position < Comment.size())
+    Comment = Comment.drop_front(Position);
+  // Use the rest of the string as a descriptor for this code snippet.
+  Regions.beginRegion(Comment, Loc);
 }
+
 
 Expected<const CodeRegions &> AsmCodeRegionGenerator::parseCodeRegions() {
   MCTargetOptions Opts;
