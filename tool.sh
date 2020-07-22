@@ -19,14 +19,14 @@ if [[ -z "$1" ]]; then
 	exit; 
 fi
 
-if [[ -z "$2" ]]; 
-	then
-		touch result.txt;
-		OUT=./result.txt;
-	else
-		touch $2 ;
-		OUT=$2;		
-fi
+#if [[ -z "$2" ]]; 
+#	then
+#		touch result.txt;
+#		OUT=./result.txt;
+#	else
+#		touch $2 ;
+#		OUT=$2;		
+#fi
 
 run(){
 	$CLANG -O0 -Xclang -disable-O0-optnone -I. -I./utilities -S -emit-llvm $1 -o out.ll 2> /dev/null
