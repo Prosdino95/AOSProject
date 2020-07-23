@@ -4,6 +4,8 @@ This project uses LLVM-MCA to compare the fixed-point code produced by TAFFO wit
 LLVM-MCA is a tool that simulates the inner behavior of the CPU to estimate the performance of a machine code snippet.</br> 
 TAFFO is an auto-tuning framework, based on LLVM 8, which tries to replace floating-point operations with fixed-point operations as much as possible.
 
+Check the document inside Report for more detailed code documentation.
+Currently, the document is in WIP.
 
 ## How to Build
 This project supports only LLVM 8.</br> 

@@ -1,0 +1,179 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University Assignment Title Page 
+% LaTeX Template
+% Version 1.0 (27/12/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% WikiBooks (http://en.wikibooks.org/wiki/LaTeX/Title_Creation)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+% Instructions for using this template:
+% This title page is capable of being compiled as is. This is not useful for 
+% including it in another document. To do this, you have two options: 
+%
+% 1) Copy/paste everything between \begin{document} and \end{document} 
+% starting at \begin{titlepage} and paste this into another LaTeX file where you 
+% want your title page.
+% OR
+% 2) Remove everything outside the \begin{titlepage} and \end{titlepage} and 
+% move this file to the same directory as the LaTeX file you wish to add it to. 
+% Then add \input{./title_page_1.tex} to your LaTeX file where you want your
+% title page.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\title{Title page with logo}
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[12pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[colorinlistoftodos]{todonotes}
+
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\center % Center everything on the page
+ 
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE Politenico di Milano}\\[1.5cm] % Name of your university/college
+\textsc{\Large Dipartimento Elettronica, Informazione e Bioingegneria}\\[0.5cm] % Major heading such as course name
+\textsc{\large HEAPLab Project Report}\\[0.5cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+{ \huge \bfseries Performance Estimation for TAFFO via LLVM-MCA}\\[0.4cm] % Title of your document
+\HRule \\[1.5cm]
+ 
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+Marco \textsc{Prosdocimi} % Your name
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisors:} \\
+Stefano \textsc{Cherubin} % Supervisor's Name
+Daniele \textsc{Cattaneo} % Supervisor's Name
+\end{flushright}
+\end{minipage}\\[2cm]
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+%\Large \emph{Author:}\\
+%John \textsc{Smith}\\[3cm] % Your name
+
+%----------------------------------------------------------------------------------------
+%	DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \today}\\[2cm] % Date, change the \today to a set date if you want to be precise
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+\includegraphics[width=100pt]{heaplogo.pdf}\\[1cm] % Include a department/university logo - this will require the graphicx package
+ 
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+
+\end{titlepage}
+
+
+
+
+\begin{abstract}
+
+Use LLVM-MCA to compare the fixed-point code produced by TAFFO with the original floating-point code for all loops in the code. 
+LLVM-MCA is a tool that simulates the inner behavior of the CPU to estimate the performance of a machine code snippet.
+TAFFO is an autotuning framework, based on LLVM 8, which tries to replace floating-point operations with fixed-point operations as much as possible.
+
+\end{abstract}
+
+\section{Introduction}
+
+The purpose of the project is to write a tool to find body loops in a c program, compile them with and without TAFFO, and use LLVM-MCA checks if TAFFO improves the execution of the loops by reducing the total amount of machine cycles required.
+
+\section{Design and Implementation}
+The tool is divided into two different parts: the Loops Finder and the LLVM-MCA analysis.
+
+\subsection{Loop Extractor}
+By using the LLVM API, I was able to write an LLVM Pass that searches loops in code and add an Assembly inline comment in the header and the exit block.\\
+The Assembly comments are "LLVM-MCA-BEGIN" and "LLVM-MCA-END". They are used in the LLVM-MCA analysis.
+In the event of nested loops, the pass marks only the most inner one.\\
+Before running this pass, we use the loop simplify pass to try to have simple form loops, with a pre-header and just one exit block.\\
+OTP executes the Loop Finder Pass after the TAFFO ones.\\
+
+\subsection{LLVM-MCA analysis}
+
+I had to modify the main of LLV-MCA so that he shows the total machine cycle count for all marked regions. LLVM-MCA is designed to print several different analysis concerned the different region that was marked in the code. For this project, I was interested only in the total amount of machine cycle for all the regions.
+In the file "llvm-mca-mod.c" I underline the originally LLVM-MCA code and the few lines that I change.
+
+\subsection{Use a heuristic approach to different weight the loops}
+WIP.
+
+
+\subsection{Tool Steps}
+The tool follows thees main step:
+\begin{enumerate}
+\item By using CLANG, it compiles the code and emits the LLVM IR.
+\item To generate the TAFFO IR file, OPT runs all TAFFO passes, and then the Loop Extractor pass.
+\item For the non TAFFO IR file, it executes only Loop Extractor pass.
+\item The two IR files are compiled using LLC.
+\item Uses the mod version of MCA on both the assembly.
+\item Print the results of the analysis for each of the two assembly file.
+\end{enumerate}
+
+\section{Experimental Results (WIP)}
+I run the tool on several tests that are used for TAFFO.
+
+\subsection{Polybench benchmarks}
+The Polybench benchmarks are 30 different tests that have one loop that dominates all the execution times.
+I run tests and get the MCA analysis for two different processors: an INTEL-I7 x86-64 CPU processor and an INTEL-CORE2 x86-64.
+
+\begin{center}
+\begin{tabular}{ |p{7cm} | p{4cm} | p{4cm}| }
+ \hline
+ \multicolumn{3}{|c|}{Result of LLVM-MCA} \\
+ \hline
+   & INTEL X86 CORE2 & INTEL X86 I7\\
+ \hline
+  Total number of tests improved by TAFFO & 10 & 20 \\
+  \hline
+  Average of machine cycle reduced by TAFFO & WIP & WIP \\
+  \hline
+
+\end{tabular}
+\end{center}
+
+
+\section{Conclusions}
+
+WIP
+
+\end{document}
