@@ -11,7 +11,7 @@ if [[ -z "$OPT" ]]; then OPT=${llvmbin}opt; fi
 if [[ -z "$LLC" ]]; then LLC=${llvmbin}llc; fi
 if [[ -z "$LLVM_LINK" ]]; then LLVM_LINK=${llvmbin}llvm-link; fi
 
-if [[ "$CPU" ]]; then CPU=-march=${CPU}; fi
+if [[ "$CPU" ]]; then CPU=-mcpu=${CPU}; fi
 if [[ "$ITER" ]]; then ITER=-iterations=${ITER}; fi	
 
 echo $CPU
@@ -28,7 +28,7 @@ run_test(){
 	$LLC -O0 ./outNormal.ll 
 	echo normal compiling 
 	echo
-	../../dist/usr/local/bin/MOD-Llvm-mca ${CPU} ${ITER} outNormal.s  2> /dev/null
+	../../dist/usr/local/bin/MOD-Llvm-mca -mcpu=core2 ${CPU} ${ITER} outNormal.s  2> /dev/null
 
 	#TAFFO Program
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoInitializer.so -taffoinit -S -o program-taffo.2.magiclangtmp.ll ./out.ll
