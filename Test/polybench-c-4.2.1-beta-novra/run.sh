@@ -21,26 +21,26 @@ rm results/result.txt
 touch results/result.txt
 
 run_test(){
-	$CLANG -O0 -Xclang -disable-O0-optnone -I. -I./utilities -S -emit-llvm $1 -o out.ll 2> /dev/null
+	$CLANG -O0 -Xclang -disable-O0-optnone ${CPU} -I. -I./utilities -S -emit-llvm $1 -o out.ll 2> /dev/null
 
 	#normal program
-	$OPT -load ~/AOSProject/dist/usr/local/lib/LoopFinder.so -LoopFinder ./out.ll -S -o ./outNormal.ll
-	$LLC -O0 ./outNormal.ll 
+	$OPT -load ~/AOSProject/dist/usr/local/lib/LoopFinder.so -structurizecfg -LoopFinder ./out.ll -S -o ./outNormal.ll
+	$LLC -O0 ${CPU} ./outNormal.ll 
 	echo normal compiling 
 	echo
-	../../dist/usr/local/bin/MOD-Llvm-mca -mcpu=core2 ${CPU} ${ITER} outNormal.s  2> /dev/null
+	../../dist/usr/local/bin/MOD-Llvm-mca ${CPU} ${ITER} outNormal.s  #2> /dev/null
 
-	#TAFFO Program
+	##TAFFO Program
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoInitializer.so -taffoinit -S -o program-taffo.2.magiclangtmp.ll ./out.ll
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoVRA.so -mem2reg -taffoVRA -S -o program-taffo.3.magiclangtmp.ll program-taffo.2.magiclangtmp.ll
 	$OPT -load ~/AOSProject/dist/usr/local/lib/TaffoDTA.so -taffodta -globaldce -S -o program-taffo.4.magiclangtmp.ll program-taffo.3.magiclangtmp.ll
 	$OPT -load ~/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so -flttofix -globaldce -dce -S -o out2.ll program-taffo.4.magiclangtmp.ll
-	$OPT -load ~/AOSProject/dist/usr/local/lib/LoopFinder.so -LoopFinder ./out2.ll -S -o ./outTAFFO.ll
-	$LLC -O0 ./outTAFFO.ll 
+	$OPT -load ~/AOSProject/dist/usr/local/lib/LoopFinder.so -structurizecfg -LoopFinder ./out2.ll -S -o ./outTAFFO.ll
+	$LLC -O0  ${CPU} ./outTAFFO.ll 
 	echo
 	echo TAFFO compiling 
 	echo
-	../../dist/usr/local/bin/MOD-Llvm-mca ${CPU} ${ITER} outTAFFO.s 2> /dev/null
+	../../dist/usr/local/bin/MOD-Llvm-mca ${CPU} ${ITER} outTAFFO.s #2> /dev/null
 	rm *.ll *.s
 	echo
 }

@@ -15,7 +15,7 @@ int sub(int a){
 		a = a+7;
 		if (a==5){
 			a= a+3;
-			//return 2;
+			return 2;
 		}
 	}
 
