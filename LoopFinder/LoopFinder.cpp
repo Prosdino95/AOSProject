@@ -94,9 +94,10 @@ void LoopFinder::addAnnotation(Loop *L){
 
   //get the Exit Block
   B = L->getUniqueExitBlock();
+  //there shouldn't be null pointer after run loop-simplify and structurizecfg passes
+  //This check is just for safety. 
   if(B == nullptr){ 
-    //TODO 
-    std::cout<<"NULLO"<<std::endl;
+    std::cout<<"The loop dasen't have a unique exit block"<<std::endl;
     return;
   }
   //insert the instruction at the end
