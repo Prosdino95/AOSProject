@@ -1,0 +1,24 @@
+opt: /usr/lib/llvm-8/include/llvm/Support/Casting.h:255: typename llvm::cast_retty<X, Y*>::ret_type llvm::cast(Y*) [with X = flttofix::UniformTypeOverlay; Y = flttofix::TypeOverlay; typename llvm::cast_retty<X, Y*>::ret_type = flttofix::UniformTypeOverlay*]: Assertion `isa<X>(Val) && "cast<Ty>() argument of incompatible type!"' failed.
+Stack dump:
+0.	Program arguments: /usr/lib/llvm-8/bin/opt -load=/home/prosdothewolf/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so -S -flttofix -dce -stats obj/main.tuner.ll -o obj/main.fixp.ll 
+1.	Running pass 'Floating Point to Fixed Point conversion pass' on module 'obj/main.tuner.ll'.
+ #0 0x00007fb40799022f llvm::sys::PrintStackTrace(llvm::raw_ostream&) (/usr/lib/x86_64-linux-gnu/libLLVM-8.so.1+0x97a22f)
+ #1 0x00007fb40798e660 llvm::sys::RunSignalHandlers() (/usr/lib/x86_64-linux-gnu/libLLVM-8.so.1+0x978660)
+ #2 0x00007fb407990638 (/usr/lib/x86_64-linux-gnu/libLLVM-8.so.1+0x97a638)
+ #3 0x00007fb40ac09540 __restore_rt (/lib/x86_64-linux-gnu/libpthread.so.0+0x15540)
+ #4 0x00007fb406b143eb gsignal /build/glibc-5mDdLG/glibc-2.30/signal/../sysdeps/unix/sysv/linux/internal-signals.h:84:10
+ #5 0x00007fb406af3899 abort /build/glibc-5mDdLG/glibc-2.30/stdlib/abort.c:81:7
+ #6 0x00007fb406af3769 get_sysdep_segment_value /build/glibc-5mDdLG/glibc-2.30/intl/loadmsgcat.c:509:8
+ #7 0x00007fb406af3769 __tls_get_addr /build/glibc-5mDdLG/glibc-2.30/intl/loadmsgcat.c:970:34
+ #8 0x00007fb406b05006 (/lib/x86_64-linux-gnu/libc.so.6+0x37006)
+ #9 0x00007fb406967d62 llvm::cast_retty<flttofix::UniformTypeOverlay, flttofix::TypeOverlay*>::ret_type llvm::cast<flttofix::UniformTypeOverlay, flttofix::TypeOverlay>(flttofix::TypeOverlay*) (/home/prosdothewolf/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so+0x103d62)
+#10 0x00007fb40697229b flttofix::FloatToFixed::convertCmp(llvm::FCmpInst*) (/home/prosdothewolf/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so+0x10e29b)
+#11 0x00007fb40696f373 flttofix::FloatToFixed::convertInstruction(llvm::Module&, llvm::Instruction*, flttofix::TypeOverlay*&) (/home/prosdothewolf/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so+0x10b373)
+#12 0x00007fb406961e5a flttofix::FloatToFixed::convertSingleValue(llvm::Module&, llvm::Value*, flttofix::TypeOverlay*&) (/home/prosdothewolf/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so+0xfde5a)
+#13 0x00007fb4069618ed flttofix::FloatToFixed::performConversion(llvm::Module&, std::vector<llvm::Value*, std::allocator<llvm::Value*> >&) (/home/prosdothewolf/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so+0xfd8ed)
+#14 0x00007fb40693f758 flttofix::FloatToFixed::runOnModule(llvm::Module&) (/home/prosdothewolf/AOSProject/dist/usr/local/lib/LLVMFloatToFixed.so+0xdb758)
+#15 0x00007fb407a8294e llvm::legacy::PassManagerImpl::run(llvm::Module&) (/usr/lib/x86_64-linux-gnu/libLLVM-8.so.1+0xa6c94e)
+#16 0x00000000004bb878 main (/usr/lib/llvm-8/bin/opt+0x4bb878)
+#17 0x00007fb406af51e3 __libc_start_main /build/glibc-5mDdLG/glibc-2.30/csu/../csu/libc-start.c:308:16
+#18 0x00000000004a679e _start (/usr/lib/llvm-8/bin/opt+0x4a679e)
+Aborted (core dumped)

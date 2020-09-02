@@ -56,6 +56,7 @@ namespace {
 char LoopFinder::ID = 0;
 
 void LoopFinder::addAnnotation(Loop *L){
+  std::cout<<"LOOP FIND"<<std::endl;
 
   StringRef asmString;	
   InlineAsm *iaExpr;
@@ -67,6 +68,12 @@ void LoopFinder::addAnnotation(Loop *L){
   Type *ResultType = Type::getVoidTy(L->getHeader()->getContext());
   FunctionType *fTy = FunctionType::get(ResultType,false);
   IRBuilder< ConstantFolder,IRBuilderDefaultInserter > Builder(L->getHeader()->getContext()); 
+
+  //check if there is a unique exit block othervise exit ang ignore the loop
+  if(L->getUniqueExitBlock() == nullptr){ 
+    std::cout<<"The loop dasen't have a unique exit block"<<std::endl;
+    return;
+  }
 
   //create __asm volatile("# LLVM-MCA-BEGIN")
   asmString = "# LLVM-MCA-BEGIN" ;
@@ -94,12 +101,7 @@ void LoopFinder::addAnnotation(Loop *L){
 
   //get the Exit Block
   B = L->getUniqueExitBlock();
-  //there shouldn't be null pointer after run loop-simplify and structurizecfg passes
-  //This check is just for safety. 
-  if(B == nullptr){ 
-    std::cout<<"The loop dasen't have a unique exit block"<<std::endl;
-    return;
-  }
+ 
   //insert the instruction at the end
   i = B->end();
   B->getInstList().insertAfter(i--,asmInst);   
@@ -117,9 +119,9 @@ void LoopFinder::handleSubLoop(Loop *L) {
 
 bool LoopFinder::runOnLoop(Loop *L, LPPassManager &LPM) {
 
-  if (skipLoop(L)){
-    return false;
-  }
+ // if (skipLoop(L)){
+ //   return false;
+ // }
 
   if (L->getParentLoop()){
     return false;
