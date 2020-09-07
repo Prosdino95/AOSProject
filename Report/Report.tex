@@ -28,7 +28,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\title{Title page with logo}
 %----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+% PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
 \documentclass[12pt]{article}
@@ -52,7 +52,7 @@
 \center % Center everything on the page
  
 %----------------------------------------------------------------------------------------
-%	HEADING SECTIONS
+% HEADING SECTIONS
 %----------------------------------------------------------------------------------------
 
 \textsc{\LARGE Politenico di Milano}\\[1.5cm] % Name of your university/college
@@ -60,7 +60,7 @@
 \textsc{\large HEAPLab Project Report}\\[0.5cm] % Minor heading such as course title
 
 %----------------------------------------------------------------------------------------
-%	TITLE SECTION
+% TITLE SECTION
 %----------------------------------------------------------------------------------------
 
 \HRule \\[0.4cm]
@@ -68,7 +68,7 @@
 \HRule \\[1.5cm]
  
 %----------------------------------------------------------------------------------------
-%	AUTHOR SECTION
+% AUTHOR SECTION
 %----------------------------------------------------------------------------------------
 
 \begin{minipage}{0.4\textwidth}
@@ -91,13 +91,13 @@ Daniele \textsc{Cattaneo} % Supervisor's Name
 %John \textsc{Smith}\\[3cm] % Your name
 
 %----------------------------------------------------------------------------------------
-%	DATE SECTION
+% DATE SECTION
 %----------------------------------------------------------------------------------------
 
 {\large \today}\\[2cm] % Date, change the \today to a set date if you want to be precise
 
 %----------------------------------------------------------------------------------------
-%	LOGO SECTION
+% LOGO SECTION
 %----------------------------------------------------------------------------------------
 
 \includegraphics[width=100pt]{heaplogo.pdf}\\[1cm] % Include a department/university logo - this will require the graphicx package
@@ -113,81 +113,254 @@ Daniele \textsc{Cattaneo} % Supervisor's Name
 
 \begin{abstract}
 
-Use LLVM-MCA to compare the fixed-point code produced by TAFFO with the original floating-point code for all loops in the code. 
-LLVM-MCA is a tool that simulates the inner behavior of the CPU to estimate the performance of a machine code snippet.
+This project aims to use LLVM-MCA to compare the fixed-point code produced by TAFFO with the original floating-point code for all loops in a given program to have a static prevision of the possible speedups gained by TAFFO.\\
+LLVM-MCA is a tool that simulates the inner behavior of the CPU to estimate the performance of a machine code snippet.\\
 TAFFO is an autotuning framework, based on LLVM 8, which tries to replace floating-point operations with fixed-point operations as much as possible.
 
 \end{abstract}
 
 \section{Introduction}
 
-The purpose of the project is to write a tool to find body loops in a c program, compile them with and without TAFFO, and use LLVM-MCA checks if TAFFO improves the execution of the loops by reducing the total amount of machine cycles required.
+The purpose of this project is to build a tool that, by using LLVM compiler infrastructure, finds loops bodies in a C program, compiles them with and without TAFFO, and uses LLVM-MCA to check if TAFFO is able to improve the execution time.
+The tool uses LLVM-MCA in order to have a static prediction of the possible speedup given by TAFFO. Up to now, possible speedups were measured only at run time.
 
 \section{Design and Implementation}
-The tool is divided into two different parts: the Loops Finder and the LLVM-MCA analysis.
+The tool consists of two different parts: the Loops Finder and the LLVM-MCA analysis.
 
-\subsection{Loop Extractor}
-By using the LLVM API, i was able to write an LLVM Pass that searches loops in code and add an Assembly inline comment in the header and the exit block.\\
-The Assembly comments are "LLVM-MCA-BEGIN" and "LLVM-MCA-END". They are used in the LLVM-MCA analysis.
-In the event of nested loops, the pass marks only the most inner one.\\
-Before running this pass, we use the loop simplify pass to try to have simple form loops, with a pre-header and just one exit block.\\
-Unfortunately, I'm not always able to render loops with a single exit block in this version of the tool this kind of loops are skipped.\\
-OTP executes the Loop Finder Pass after the TAFFO ones.\\
+\subsection{Loop Finder}
+The Loop Finder uses LLVM API to search loops in code and to add an Assembly inline comment to the loop's header and to the exit block.
+The Assembly comments are "LLVM-MCA-BEGIN" and "LLVM-MCA-END"; 
+ LLVM-MCA uses them to generate the region of code to analyze,
+In the event of nested loops, the Loop Finder marks only the innermost ones.
+Before running Loop Finder, loops are transformed into their canonical form: the latter has a pre-header and a single exit block. To realize that, I used Loop Simplify LLVM pass that runs before Loop Finder.
+Unfortunately, even by using Loop Simplify, I was not always able to transform loops into a form that allows them to have a single exit block.\\
+In the current version of the tool, these kinds of loops are skipped.
 
 \subsection{LLVM-MCA analysis}
 
-I had to modify the main of LLV-MCA so that he shows the total machine cycle count for all marked regions. LLVM-MCA is designed to print several different analysis concerned the different region that was marked in the code. For this project, I was interested only in the total amount of machine cycle for all the regions.
-In the file "llvm-mca-mod.c" I underline the originally LLVM-MCA code and the few lines that I change.
+LLVM-MAC is a performance analysis tool that uses information available in LLVM (e.g. scheduling models) to statically measure the performance of machine code in a specific CPU.
+I modified the main procedure of LLV-MCA so that it can show the total machine cycle count for all marked regions. Original LLVM-MCA was designed to print different analyses for all different regions marked in the code.
+Having a general estimate of machine cycles, instead of several evaluations for individual regions, it will make it easier to evaluate a possible speedup.
+In the file "llvm-mca-mod.c" I underlined the original LLVM-MCA code and the few lines that I have changed.
 
 
-\subsection{Tool Steps}
-The tool follows thees main step:
+\subsection{Outline of the operation performed by the tool}
+The execution of the tool follows these main steps:
 \begin{enumerate}
-\item By using CLANG, it compiles the code and emits the LLVM IR.
-\item To generate the TAFFO IR file, OPT runs all TAFFO passes, and then the Loop Extractor pass.
-\item For the non TAFFO IR file, it executes only Loop Extractor pass.
+\item By using CLANG, it compiles the code and emits two LLVM IR files.
+\item To generate the TAFFO IR file, it runs all TAFFO passes, and then the Loop Extractor pass.
+\item To generate the non TAFFO IR file, it executes only Loop Extractor pass.
 \item The two IR files are compiled using LLC.
-\item Uses the mod version of MCA on both the assembly.
-\item Print the results of the analysis for each of the two assembly file.
+\item The modified version of LLVM-MCA is used to compute the cycle count on both of the Assembly files
+\item For both of the files, the tool prints the results of the analysis.
 \end{enumerate}
 
-\section{Experimental Results}
-I run the tool on several tests get the MCA analysis for AMD A8-6600K a x86 CPU 64 bit.
+\section{Experimental procedure and evaluation}
+To validate the operation of the tool, I ran several benchmarks.
+I got the tool analysis for AMD A8-6600K a x86 CPU 64 bit, and I compared the speedup statically estimated by the tool with the real speedup measured at run time.
 
 \subsection{Polybench benchmarks}
-The Polybench benchmarks are 30 different tests that have one loop that dominates all the execution times.
-I wrote a shell script that runs those tests with and without TAFFO and use my tools to estimate the number of machine cycles.
+PolyBench is a collection of benchmarks used to validate compiler parts. It consists of 30 different tests which have a single loop that dominates all the execution times. \\
+By looking at the results in table 2, it can be observed that the predictions are not very accurate.
+This behavior could be due to the inability of LLVM-MCA to predict cache behavior.
+In the future, it will be necessary to repeat the tests using machines without cache, such as some microcontrollers.
+
+
+\subsection{Axbench benchmarks}
+
+AxBench is a suite of benchmarks use to evaluate applications for approximate computing.
+For these benchmarks, instead of using the shell script tool, I wrote a Makefile that compiles the code with and without TAFFO and generates two different assembly files.
+Then I used the modified version of LLVM-MCA on both Assembly files to estimate the machine cycles.
+Even in this case, the tool's previsions are not very accurate.
+The biggest problem lies in the impossibility of the current version of the tool to analyze all kinds of loops, as expressed in section 2.1.
 
 \begin{table}[ht]
 \begin{center}
-\caption{summary of Polybench benchmarks}
+\caption{compare of speedup predict by the tool and real measured speedup for axbench}
 \vspace{0.5cm}
-\begin{tabular}{ |p{7cm} | p{4cm} | }
+\begin{tabular}{ |c|c|c| } 
  \hline
- \multicolumn{2}{|c|}{Result of LLVM-MCA} \\
+Test Name & predicted speedup & real speedup \\
  \hline
-  Total number of tests improved by TAFFO & 11  \\
-  \hline
-  Average of machine cycle reduced by TAFFO & 1130 \\
-  \hline
+  Blackscholes & 0.747 & 1.176 \\
+ \hline
+  fft & 3.254 & 0.998 \\
+ \hline
+  jmeint & 1.130 & 0.629\\
+ \hline
+  sobel & 2.430 & 0.0639 \\
+ \hline
+  inversek2j & 2.300 & 0.995 \\
+ \hline
+ \end{tabular}
+\end{center}
+\end{table}
+
+\newpage
+
+\begin{table}
+\begin{center}
+\caption{Compare of the speedup predict by the tool and real measured speedup for Polybench}
+\vspace{0.2cm}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+Test Name & predicted speedup & real speedup \\
+ \hline
+ correlation.c & 0.885 & 1.840 \\
+ \hline
+  covariance.c & 0.8896 & 1.919 \\
+ \hline
+  2mm.c & 1.164 & 2.153 \\
+ \hline
+  3mm.c & 1.187 & 2.598 \\
+ \hline
+  atax.c & 0.985 & 2.248 \\
+ \hline
+  bicg.c & 1.016 & 1.807 \\
+ \hline
+  doitgen.c & 0.809 & 3.157 \\
+ \hline
+  mvt.c & 0.953 & 2.232 \\
+ \hline
+  gemm.c & 1.126 & 0.822\\
+ \hline
+  gemver.c & 1.021 & 1.268 \\
+ \hline
+  gesummv.c & 1.138 & 1.740 \\
+ \hline
+  symm.c & 0.953 & 1.076 \\
+ \hline
+  syr2k.c & 1.126 & 0.696 \\
+ \hline
+  syrk.c & 1.096 & 0.918 \\
+ \hline
+  trmm.c & 1.024 & 1.996 \\
+ \hline
+  cholesky.c & 1.027 & 2.925 \\
+ \hline
+  durbin.c & 0.786 & 0.991 \\
+ \hline
+  gramschmidt.c & 0.963 & 1.235 \\
+ \hline
+  lu.c & 1.026 & 1.277 \\
+ \hline
+  ludcmp.c & 0.861 & 0.826 \\
+ \hline
+  trisolv.c & 0.858 & 2.491 \\
+ \hline
+  deriche.c & 0.664 & 1.429 \\
+ \hline
+  floyd-warshall.c & 0.974 & 2.370 \\
+ \hline
+  nussinov.c & 0.867 & 1.130 \\
+ \hline
+  adi.c & 0.924 & 0.936 \\
+ \hline
+  fdtd-2d.c & 0.852 & 2.720 \\
+ \hline
+  heat-3d.c & 0.915 & 3.107 \\
+ \hline
+  jacobi-1d.c & 0.934 & 1.696 \\
+ \hline
+  jacobi-2d.c & 0.956 & 1.860 \\
+ \hline
+  seidel-2d.c & 0.886 & 3.123 \\
+ \hline
+\end{tabular}
+\end{center}
+\end{table}
+\newpage
+
+
+\section{Conclusions and future developments}
+
+The tool I created is useful if used as a new component of the TAFFO tool's chain, but it certainly needs some improvements.
+The challenge in managing some specific kinds of loops, those that don't have a single exit block after the execution of Loop Simplify, makes the tool not entirely usable.
+In the future, it will be necessary to change the "Loop Extractor" LLVM pass in order to add support to properly handle these kinds of loops that are currently skipped.
+This problem is presented in some Axebench; thus, not all benchmarks result are fully reliable yet.
+The best result when using TAFFO is achieved with machines without FPU(Floating Point Unit). In the future, it will be useful to repeat all benchmarks in this type of machine.
+
+
+\begin{table}
+\section{\fontsize{12}{15}\selectfont Appendix A Machine cycles measured by used the tool}
+\begin{center}
+\caption{Machine cycle measured by use the tool for Polybench benchmarks (MC means machine cycles)}
+\vspace{0.2cm}
+\begin{tabular}{ |c|c|c| } 
+ \hline
+Test Name & predicted speedup & real speedup \\
+ \hline
+ correlation.c & 0.885 & 1.840 \\
+ \hline
+  covariance.c & 0.8896 & 1.919 \\
+ \hline
+  2mm.c & 1.164 & 2.153 \\
+ \hline
+  3mm.c & 1.187 & 2.598 \\
+ \hline
+  atax.c & 0.985 & 2.248 \\
+ \hline
+  bicg.c & 1.016 & 1.807 \\
+ \hline
+  doitgen.c & 0.809 & 3.157 \\
+ \hline
+  mvt.c & 0.953 & 2.232 \\
+ \hline
+  gemm.c & 1.126 & 0.822\\
+ \hline
+  gemver.c & 1.021 & 1.268 \\
+ \hline
+  gesummv.c & 1.138 & 1.740 \\
+ \hline
+  symm.c & 0.953 & 1.076 \\
+ \hline
+  syr2k.c & 1.126 & 0.696 \\
+ \hline
+  syrk.c & 1.096 & 0.918 \\
+ \hline
+  trmm.c & 1.024 & 1.996 \\
+ \hline
+  cholesky.c & 1.027 & 2.925 \\
+ \hline
+  durbin.c & 0.786 & 0.991 \\
+ \hline
+  gramschmidt.c & 0.963 & 1.235 \\
+ \hline
+  lu.c & 1.026 & 1.277 \\
+ \hline
+  ludcmp.c & 0.861 & 0.826 \\
+ \hline
+  trisolv.c & 0.858 & 2.491 \\
+ \hline
+  deriche.c & 0.664 & 1.429 \\
+ \hline
+  floyd-warshall.c & 0.974 & 2.370 \\
+ \hline
+  nussinov.c & 0.867 & 1.130 \\
+ \hline
+  adi.c & 0.924 & 0.936 \\
+ \hline
+  fdtd-2d.c & 0.852 & 2.720 \\
+ \hline
+  heat-3d.c & 0.915 & 3.107 \\
+ \hline
+  jacobi-1d.c & 0.934 & 1.696 \\
+ \hline
+  jacobi-2d.c & 0.956 & 1.860 \\
+ \hline
+  seidel-2d.c & 0.886 & 3.123 \\
+ \hline
 \end{tabular}
 \end{center}
 \end{table}
 
-See Appendix A for more detail about sinlgle tests.
-\subsection{Axbench benchmarks}
-
-For these tests, instead of using the shell script tool, i wrote a Make file that compiles the code with and without TAFFO. 
-I generating two different assembly code.
-Then i use the LLVM-MCA to estimate the machine cycles.
-
 \begin{table}[ht]
 \begin{center}
-\caption{machine cycle measured by use LLVM MCA for Axbench benchmarks}
+\caption{Machine cycle measured by use the tool for Axbench benchmarks (MC means machine cycles)}
 \vspace{0.5cm}
 \begin{tabular}{ |c|c|c| } 
  \hline
-Test Name & Total number of CC & Total number of CC with TAFFO \\
+Test Name & Total number of MC & Total number of MC with TAFFO \\
  \hline
   Blackscholes & 6402 & 8571 \\
  \hline
@@ -200,87 +373,6 @@ Test Name & Total number of CC & Total number of CC with TAFFO \\
   inversek2j & 102512 & 44571 \\
  \hline
  \end{tabular}
-\end{center}
-\end{table}
-
-\section{Conclusions and future study}
-
-The tool created is useful in the development of TAFFO but certainly needs some improvements.
-The challenging management of some loops makes the tool not entirely usable. In the future, we will have to change the "Loop Extractor" LLVM pass to be able to manage those loops that do not have a single exit block.
-This problem is present in some Axebench, so not all tests are fully reliable yet.
-In order to see the best TAFFO improvement, it is necessary to do some tests with machines without FPU (Floating point unit). Repeat Axbench and Polybench benchmarks in this machine type can be a useful study.
-
-\newpage
-\begin{table}[ht]
-\section{\fontsize{12}{15}\selectfont Appendix A Polybenc benchmarks}
-\begin{center}
-\begin{tabular}{ |c|c|c| } 
- \hline
-Test Name & Total number of CC & Total number of CC with TAFFO \\
- \hline
- correlation.c & 11379 & 12851 \\
- \hline
-  covariance.c & 7086 & 7910 \\
- \hline
-  2mm.c & 18940 & 16261 \\
- \hline
-  3mm.c & 20772 & 17490 \\
- \hline
-  atax.c & 8660 & 8791 \\
- \hline
-  bicg.c & 14088 & 13855 \\
- \hline
-  doitgen.c & 11557 & 14282 \\
- \hline
-  mvt.c & 10634 & 11150 \\
- \hline
-  gemm.c & 13633 & 12105 \\
- \hline
-  gemver.c & 10101 & 9892 \\
- \hline
-  gesummv.c & 10776 & 9467 \\
- \hline
-  symm.c & 12764 & 13384 \\
- \hline
-  syr2k.c & 13609 & 12082 \\
- \hline
-  syrk.c & 10509 & 9582 \\
- \hline
-  trmm.c & 7641 & 7458 \\
- \hline
-  cholesky.c & 10705 & 10425 \\
- \hline
-  durbin.c & 4789 & 6089 \\
- \hline
-  gramschmidt.c & 11949 & 12399 \\
- \hline
-  lu.c & 10705 & 10425 \\
- \hline
-  ludcmp.c & 13660 & 15862 \\
- \hline
-  trisolv.c & 4884 & 5688 \\
- \hline
-  deriche.c & 14938 & 22465 \\
- \hline
-  floyd-warshall.c & 16627 & 17054 \\
- \hline
-  nussinov.c & 8506 & 9807 \\
- \hline
-  adi.c & 7968 & 8615 \\
- \hline
-  fdtd-2d.c & 13527 & 15870 \\
- \hline
-  heat-3d.c & 14331 & 15655 \\
- \hline
-  jacobi-1d.c & 5874 & 6283 \\
- \hline
-  jacobi-2d.c & 7883 & 8562 \\
- \hline
-  seidel-2d.c & 8700 & 9811 \\
- \hline
- 
- 
-\end{tabular}
 \end{center}
 \end{table}
 
