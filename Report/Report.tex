@@ -113,7 +113,7 @@ Daniele \textsc{Cattaneo} % Supervisor's Name
 
 \begin{abstract}
 
-This project aims to use LLVM-MCA to compare the fixed-point code produced by TAFFO with the original floating-point code for all loops in a given program to have a static prevision of the possible speedups gained by TAFFO.\\
+This project aims to use LLVM-MCA to compare the fixed-point code produced by TAFFO with the original floating-point code for all loops in a given program to obtain a static prediction of the possible speedups gained by TAFFO.\\
 LLVM-MCA is a tool that simulates the inner behavior of the CPU to estimate the performance of a machine code snippet.\\
 TAFFO is an autotuning framework, based on LLVM 8, which tries to replace floating-point operations with fixed-point operations as much as possible.
 
@@ -121,35 +121,35 @@ TAFFO is an autotuning framework, based on LLVM 8, which tries to replace floati
 
 \section{Introduction}
 
-The purpose of this project is to build a tool that, by using LLVM compiler infrastructure, finds loops bodies in a C program, compiles them with and without TAFFO, and uses LLVM-MCA to check if TAFFO is able to improve the execution time.
+The purpose of this project is to build a tool that, by using the LLVM compiler infrastructure, finds loop bodies in a C program, compiles them with and without TAFFO, and uses LLVM-MCA to check if TAFFO is able to improve the execution time.
 The tool uses LLVM-MCA in order to have a static prediction of the possible speedup given by TAFFO. Up to now, possible speedups were measured only at run time.
 
 \section{Design and Implementation}
-The tool consists of two different parts: the Loops Finder and the LLVM-MCA analysis.
+The tool consists of two different parts: the Loop Finder and the LLVM-MCA analysis.
 
 \subsection{Loop Finder}
-The Loop Finder uses LLVM API to search loops in code and to add an Assembly inline comment to the loop's header and to the exit block.
+The Loop Finder uses LLVM APIs to search loops in the code and than add an Assembly inline comment then the loop's header and to the exit block.
 The Assembly comments are "LLVM-MCA-BEGIN" and "LLVM-MCA-END"; 
- LLVM-MCA uses them to generate the region of code to analyze,
+ LLVM-MCA uses them to identify the region of code to analyze.
 In the event of nested loops, the Loop Finder marks only the innermost ones.
-Before running Loop Finder, loops are transformed into their canonical form: the latter has a pre-header and a single exit block. To realize that, I used Loop Simplify LLVM pass that runs before Loop Finder.
+Before running Loop Finder, loops are transformed into their canonical form: the latter has a pre-header and a single exit block. To realize that, I used the Loop Simplify LLVM pass that runs before Loop Finder.
 Unfortunately, even by using Loop Simplify, I was not always able to transform loops into a form that allows them to have a single exit block.\\
 In the current version of the tool, these kinds of loops are skipped.
 
 \subsection{LLVM-MCA analysis}
 
-LLVM-MAC is a performance analysis tool that uses information available in LLVM (e.g. scheduling models) to statically measure the performance of machine code in a specific CPU.
-I modified the main procedure of LLV-MCA so that it can show the total machine cycle count for all marked regions. Original LLVM-MCA was designed to print different analyses for all different regions marked in the code.
-Having a general estimate of machine cycles, instead of several evaluations for individual regions, it will make it easier to evaluate a possible speedup.
+LLVM-MCA is a performance analysis tool that uses information available in LLVM (e.g. scheduling models) to statically measure the performance of machine code in a specific CPU.
+I modified the main procedure of LLV-MCA so that it can show the total machine cycle count for all marked regions. The original version of LLVM-MCA was designed to print different analyses for all different regions marked in the code.
+Having a general estimate of machine cycles, instead of several evaluations for individual regions, will make it easier to evaluate a possible speedup.
 In the file "llvm-mca-mod.c" I underlined the original LLVM-MCA code and the few lines that I have changed.
 
 
 \subsection{Outline of the operation performed by the tool}
 The execution of the tool follows these main steps:
 \begin{enumerate}
-\item By using CLANG, it compiles the code and emits two LLVM IR files.
-\item To generate the TAFFO IR file, it runs all TAFFO passes, and then the Loop Extractor pass.
-\item To generate the non TAFFO IR file, it executes only Loop Extractor pass.
+\item By using clang, it compiles the code and emits two LLVM IR files.
+\item To generate the TAFFO IR file, it runs all TAFFO passes, and then the Loop Finder pass.
+\item To generate the non TAFFO IR file, it executes only the Loop Finder pass.
 \item The two IR files are compiled using LLC.
 \item The modified version of LLVM-MCA is used to compute the cycle count on both of the Assembly files
 \item For both of the files, the tool prints the results of the analysis.
@@ -157,16 +157,16 @@ The execution of the tool follows these main steps:
 
 \section{Experimental procedure and evaluation}
 To validate the operation of the tool, I ran several benchmarks.
-I got the tool analysis for AMD A8-6600K a x86 CPU 64 bit, and I compared the speedup statically estimated by the tool with the real speedup measured at run time.
+I performed the analysis using the tool on an AMD A8-6600K x86 CPU 64 bit, and I compared the speedup statically estimated by the tool with the real speedup measured at run time.
 
 \subsection{Polybench benchmarks}
-PolyBench is a collection of benchmarks used to validate compiler parts. It consists of 30 different tests which have a single loop that dominates all the execution times. \\
+PolyBench is a collection of benchmarks used to validate experimental compilers. It consists of 30 different tests which have a single loop that dominates all the execution times. \\
 By looking at the results in table 2, it can be observed that the predictions are not very accurate.
 This behavior could be due to the inability of LLVM-MCA to predict cache behavior.
 In the future, it will be necessary to repeat the tests using machines without cache, such as some microcontrollers.
 
 
-\subsection{Axbench benchmarks}
+\subsection{AxBench benchmarks}
 
 AxBench is a suite of benchmarks use to evaluate applications for approximate computing.
 For these benchmarks, instead of using the shell script tool, I wrote a Makefile that compiles the code with and without TAFFO and generates two different assembly files.
@@ -176,13 +176,13 @@ The biggest problem lies in the impossibility of the current version of the tool
 
 \begin{table}[ht]
 \begin{center}
-\caption{compare of speedup predict by the tool and real measured speedup for axbench}
+\caption{Comparison of the speedup predicted by the tool and the measured speedup for AxBench}
 \vspace{0.5cm}
 \begin{tabular}{ |c|c|c| } 
  \hline
-Test Name & predicted speedup & real speedup \\
+Test Name & Predicted speedup & Real speedup \\
  \hline
-  Blackscholes & 0.747 & 1.176 \\
+  blackscholes & 0.747 & 1.176 \\
  \hline
   fft & 3.254 & 0.998 \\
  \hline
@@ -200,11 +200,11 @@ Test Name & predicted speedup & real speedup \\
 
 \begin{table}
 \begin{center}
-\caption{Compare of the speedup predict by the tool and real measured speedup for Polybench}
+\caption{Comparison of the speedup predict by the tool and the measured speedup for Polybench}
 \vspace{0.2cm}
 \begin{tabular}{ |c|c|c| } 
  \hline
-Test Name & predicted speedup & real speedup \\
+Test Name & Predicted speedup & Real speedup \\
  \hline
  correlation.c & 0.885 & 1.840 \\
  \hline
@@ -275,80 +275,80 @@ Test Name & predicted speedup & real speedup \\
 \section{Conclusions and future developments}
 
 The tool I created is useful if used as a new component of the TAFFO tool's chain, but it certainly needs some improvements.
-The challenge in managing some specific kinds of loops, those that don't have a single exit block after the execution of Loop Simplify, makes the tool not entirely usable.
-In the future, it will be necessary to change the "Loop Extractor" LLVM pass in order to add support to properly handle these kinds of loops that are currently skipped.
-This problem is presented in some Axebench; thus, not all benchmarks result are fully reliable yet.
-The best result when using TAFFO is achieved with machines without FPU(Floating Point Unit). In the future, it will be useful to repeat all benchmarks in this type of machine.
+The challenge in managing some specific kinds of loops -- those that don't have a single exit block after the execution of Loop Simplify -- makes the tool not entirely usable.
+In the future, it will be necessary to change the "Loop Extractor" LLVM pass in order to add support to these kinds of loops that are currently skipped.
+This problem is presented in some AxBench; thus, not all benchmarks result are fully reliable yet.
+The best results when using TAFFO is achieved with machines without FPU (Floating Point Unit). In the future, it will be useful to repeat all benchmarks in this type of machine.
 
 
 \begin{table}
 \section{\fontsize{12}{15}\selectfont Appendix A Machine cycles measured by used the tool}
 \begin{center}
-\caption{Machine cycle measured by use the tool for Polybench benchmarks (MC means machine cycles)}
+\caption{Machine cycles estimated by using the tool for Polybench benchmarks (MC means machine cycles)}
 \vspace{0.2cm}
 \begin{tabular}{ |c|c|c| } 
  \hline
-Test Name & predicted speedup & real speedup \\
+Test Name & Predicted speedup & Real speedup \\
  \hline
- correlation.c & 0.885 & 1.840 \\
+ correlation.c & 11379 & 12851 \\
  \hline
-  covariance.c & 0.8896 & 1.919 \\
+  covariance.c & 7086 & 7910 \\
  \hline
-  2mm.c & 1.164 & 2.153 \\
+  2mm.c & 18940 & 16261 \\
  \hline
-  3mm.c & 1.187 & 2.598 \\
+  3mm.c & 20772 & 17490 \\
  \hline
-  atax.c & 0.985 & 2.248 \\
+  atax.c & 8660 & 8791 \\
  \hline
-  bicg.c & 1.016 & 1.807 \\
+  bicg.c & 14088 & 13855 \\
  \hline
-  doitgen.c & 0.809 & 3.157 \\
+  doitgen.c & 11557 & 14282 \\
  \hline
-  mvt.c & 0.953 & 2.232 \\
+  mvt.c & 10634 & 11150 \\
  \hline
-  gemm.c & 1.126 & 0.822\\
+  gemm.c & 13633 & 12105 \\
  \hline
-  gemver.c & 1.021 & 1.268 \\
+  gemver.c & 10101 & 9892 \\
  \hline
-  gesummv.c & 1.138 & 1.740 \\
+  gesummv.c & 10776 & 9467 \\
  \hline
-  symm.c & 0.953 & 1.076 \\
+  symm.c & 12764 & 13384 \\
  \hline
-  syr2k.c & 1.126 & 0.696 \\
+  syr2k.c & 13609 & 12082 \\
  \hline
-  syrk.c & 1.096 & 0.918 \\
+  syrk.c & 10509 & 9582 \\
  \hline
-  trmm.c & 1.024 & 1.996 \\
+  trmm.c & 7641 & 7458 \\
  \hline
-  cholesky.c & 1.027 & 2.925 \\
+  cholesky.c & 10705 & 10425 \\
  \hline
-  durbin.c & 0.786 & 0.991 \\
+  durbin.c & 4789 & 6089 \\
  \hline
-  gramschmidt.c & 0.963 & 1.235 \\
+  gramschmidt.c & 11949 & 12399 \\
  \hline
-  lu.c & 1.026 & 1.277 \\
+  lu.c & 10705 & 10425 \\
  \hline
-  ludcmp.c & 0.861 & 0.826 \\
+  ludcmp.c & 13660 & 15862 \\
  \hline
-  trisolv.c & 0.858 & 2.491 \\
+  trisolv.c & 4884 & 5688 \\
  \hline
-  deriche.c & 0.664 & 1.429 \\
+  deriche.c & 14938 & 22465 \\
  \hline
-  floyd-warshall.c & 0.974 & 2.370 \\
+  floyd-warshall.c & 16627 & 17054 \\
  \hline
-  nussinov.c & 0.867 & 1.130 \\
+  nussinov.c & 8506 & 9807 \\
  \hline
-  adi.c & 0.924 & 0.936 \\
+  adi.c & 7968 & 8615 \\
  \hline
-  fdtd-2d.c & 0.852 & 2.720 \\
+  fdtd-2d.c & 13527 & 15870 \\
  \hline
-  heat-3d.c & 0.915 & 3.107 \\
+  heat-3d.c & 14331 & 15655 \\
  \hline
-  jacobi-1d.c & 0.934 & 1.696 \\
+  jacobi-1d.c & 5874 & 6283 \\
  \hline
-  jacobi-2d.c & 0.956 & 1.860 \\
+  jacobi-2d.c & 7883 & 8562 \\
  \hline
-  seidel-2d.c & 0.886 & 3.123 \\
+  seidel-2d.c & 8700 & 9811 \\
  \hline
 \end{tabular}
 \end{center}
@@ -356,7 +356,7 @@ Test Name & predicted speedup & real speedup \\
 
 \begin{table}[ht]
 \begin{center}
-\caption{Machine cycle measured by use the tool for Axbench benchmarks (MC means machine cycles)}
+\caption{Machine cycles estimated by using the tool for AxBench benchmarks (MC means machine cycles)}
 \vspace{0.5cm}
 \begin{tabular}{ |c|c|c| } 
  \hline
