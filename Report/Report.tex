@@ -28,7 +28,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\title{Title page with logo}
 %----------------------------------------------------------------------------------------
-% PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
 \documentclass[12pt]{article}
@@ -52,7 +52,7 @@
 \center % Center everything on the page
  
 %----------------------------------------------------------------------------------------
-% HEADING SECTIONS
+%	HEADING SECTIONS
 %----------------------------------------------------------------------------------------
 
 \textsc{\LARGE Politenico di Milano}\\[1.5cm] % Name of your university/college
@@ -60,7 +60,7 @@
 \textsc{\large HEAPLab Project Report}\\[0.5cm] % Minor heading such as course title
 
 %----------------------------------------------------------------------------------------
-% TITLE SECTION
+%	TITLE SECTION
 %----------------------------------------------------------------------------------------
 
 \HRule \\[0.4cm]
@@ -68,7 +68,7 @@
 \HRule \\[1.5cm]
  
 %----------------------------------------------------------------------------------------
-% AUTHOR SECTION
+%	AUTHOR SECTION
 %----------------------------------------------------------------------------------------
 
 \begin{minipage}{0.4\textwidth}
@@ -91,13 +91,13 @@ Daniele \textsc{Cattaneo} % Supervisor's Name
 %John \textsc{Smith}\\[3cm] % Your name
 
 %----------------------------------------------------------------------------------------
-% DATE SECTION
+%	DATE SECTION
 %----------------------------------------------------------------------------------------
 
 {\large \today}\\[2cm] % Date, change the \today to a set date if you want to be precise
 
 %----------------------------------------------------------------------------------------
-% LOGO SECTION
+%	LOGO SECTION
 %----------------------------------------------------------------------------------------
 
 \includegraphics[width=100pt]{heaplogo.pdf}\\[1cm] % Include a department/university logo - this will require the graphicx package
@@ -128,7 +128,7 @@ The tool uses LLVM-MCA in order to have a static prediction of the possible spee
 The tool consists of two different parts: the Loop Finder and the LLVM-MCA analysis.
 
 \subsection{Loop Finder}
-The Loop Finder uses LLVM APIs to search loops in the code and than add an Assembly inline comment then the loop's header and to the exit block.
+The Loop Finder uses LLVM APIs to search loops in the code and then add an Assembly inline comment then the loop's header and to the exit block.
 The Assembly comments are "LLVM-MCA-BEGIN" and "LLVM-MCA-END"; 
  LLVM-MCA uses them to identify the region of code to analyze.
 In the event of nested loops, the Loop Finder marks only the innermost ones.
@@ -139,7 +139,7 @@ In the current version of the tool, these kinds of loops are skipped.
 \subsection{LLVM-MCA analysis}
 
 LLVM-MCA is a performance analysis tool that uses information available in LLVM (e.g. scheduling models) to statically measure the performance of machine code in a specific CPU.
-I modified the main procedure of LLV-MCA so that it can show the total machine cycle count for all marked regions. The original version of LLVM-MCA was designed to print different analyses for all different regions marked in the code.
+I modified the main procedure of LLVM-MCA so that it can show the total machine cycle count for all marked regions. The original version of LLVM-MCA was designed to print different analyses for all different regions marked in the code.
 Having a general estimate of machine cycles, instead of several evaluations for individual regions, will make it easier to evaluate a possible speedup.
 In the file "llvm-mca-mod.c" I underlined the original LLVM-MCA code and the few lines that I have changed.
 
@@ -157,7 +157,7 @@ The execution of the tool follows these main steps:
 
 \section{Experimental procedure and evaluation}
 To validate the operation of the tool, I ran several benchmarks.
-I performed the analysis using the tool on an AMD A8-6600K x86 CPU 64 bit, and I compared the speedup statically estimated by the tool with the real speedup measured at run time.
+I performed the analysis using the tool on an AMD A8-6600K x86 64 bit CPU, and I compared the speedup statically estimated by the tool with the real speedup measured at run time.
 
 \subsection{Polybench benchmarks}
 PolyBench is a collection of benchmarks used to validate experimental compilers. It consists of 30 different tests which have a single loop that dominates all the execution times. \\
@@ -282,13 +282,13 @@ The best results when using TAFFO is achieved with machines without FPU (Floatin
 
 
 \begin{table}
-\section{\fontsize{12}{15}\selectfont Appendix A Machine cycles measured by used the tool}
+\section{\fontsize{12}{15}\selectfont Appendix A Machine cycles measured by using the tool}
 \begin{center}
 \caption{Machine cycles estimated by using the tool for Polybench benchmarks (MC means machine cycles)}
 \vspace{0.2cm}
 \begin{tabular}{ |c|c|c| } 
  \hline
-Test Name & Predicted speedup & Real speedup \\
+Test Name & Total number of MC & Total number of MC with TAFFO \\
  \hline
  correlation.c & 11379 & 12851 \\
  \hline
